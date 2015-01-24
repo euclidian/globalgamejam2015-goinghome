@@ -39,15 +39,31 @@
     <property name="type" value="2"/>
    </properties>
   </object>
-  <object x="352" y="480" width="288" height="64"/>
-  <object x="928" y="0" width="32" height="480">
+  <object x="352" y="544" width="288" height="64">
+   <properties>
+    <property name="type" value="3"/>
+   </properties>
+  </object>
+  <object x="960" y="0" width="32" height="480">
    <properties>
     <property name="type" value="1"/>
    </properties>
   </object>
-  <object x="0" y="0" width="32" height="480">
+  <object x="-32" y="0" width="32" height="480">
    <properties>
     <property name="type" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="spawn">
+  <object x="64" y="416" width="32" height="32">
+   <properties>
+    <property name="type" value="1"/>
+   </properties>
+  </object>
+  <object x="704" y="416" width="32" height="32">
+   <properties>
+    <property name="type" value="2"/>
    </properties>
   </object>
  </objectgroup>

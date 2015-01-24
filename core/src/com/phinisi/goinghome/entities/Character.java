@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.phinisi.goinghome.animation.TextureAnimation;
 import com.phinisi.goinghome.utilities.BodyFactory;
+import com.phinisi.goinghome.utilities.Constants;
 
 public class Character extends PhysicsObject{
 	
@@ -16,16 +17,22 @@ public class Character extends PhysicsObject{
 	private Texture texture1;
 	private Texture texture2;
 	
+	private Texture eggTexture;
+	
 	TextureAnimation animation;
+	
+	private boolean isCarryingEgg = false;
 	
 	public Character(World world){		
 		texture = new Texture("karakter/kar-1.png");
 		texture1 = new Texture("karakter/kar-1.png");
 		texture2 = new Texture("karakter/kar-2.png");
+		
+		eggTexture = new Texture("marker.png");
 		animation = new TextureAnimation(0.5f, true, texture1,texture2);
 		this.charSprite = new Sprite(texture);
 		this.charSprite.setPosition(100, 250);
-		this.body = BodyFactory.CreateBody(100, 250, charSprite.getWidth(), charSprite.getHeight(), BodyType.DynamicBody, world);
+		this.body = BodyFactory.CreateBody(100, 250, charSprite.getWidth(), charSprite.getHeight(), BodyType.DynamicBody, world, Constants.CharCategory,(short)0xffff);
 		this.body.setUserData(this);
 		
 	}
@@ -33,7 +40,7 @@ public class Character extends PhysicsObject{
 	public void jump() {		
 		Gdx.app.log("A", "Jump, body mass: "+ body.getMass());
 //		this.body.applyLinearImpulse(new Vector2(0, 10000), new Vector2(this.charSprite.getX(), this.charSprite.getY()), false);
-		this.body.applyForceToCenter(new Vector2(0, 3), true);
+		this.body.applyForceToCenter(new Vector2(0, 15), true);
 //		this.body.applyLinearImpulse(new Vector2(0, 100),body.getLocalCenter(),true);
 //		this.body.setLinearVelocity(0, 1000);
 //		float impulse = 1;
@@ -44,13 +51,13 @@ public class Character extends PhysicsObject{
 	public void moveRight() {		
 //		this.body.setLinearVelocity(5, body.getLinearVelocity().y);
 		if(this.body.getLinearVelocity().x < 3){
-			this.body.applyForceToCenter(new Vector2(1, 0), true);
+			this.body.applyForceToCenter(new Vector2(3, 0), true);
 		}
 	}
 
 	public void moveLeft() {
 		if(this.body.getLinearVelocity().x > -3 ){
-			this.body.applyForceToCenter(new Vector2(-1, 0), true);
+			this.body.applyForceToCenter(new Vector2(-3, 0), true);
 		}		
 //		this.body.setLinearVelocity(-5, body.getLinearVelocity().y);
 	}
@@ -75,7 +82,7 @@ public class Character extends PhysicsObject{
 		}else{
 			animation.reset();
 			animation.setActive(false);
-		}
+		}		
 	}
 	
 	@Override
@@ -86,5 +93,26 @@ public class Character extends PhysicsObject{
 			this.charSprite.setTexture(texture);
 			super.draw(spriteBatch);
 		}
+		if(isCarryingEgg){
+			spriteBatch.draw(eggTexture, charSprite.getX(), charSprite.getY() + charSprite.getHeight());
+		}
 	}
+
+	public boolean isCarryingEgg() {
+		return isCarryingEgg;
+	}
+
+	public void setCarryingEgg(boolean isCarryingEgg) {
+		this.isCarryingEgg = isCarryingEgg;
+	}
+
+	public void carryEgg() {		
+		this.isCarryingEgg = true;
+	}
+
+	public void releaseEgg() {
+		this.isCarryingEgg = false;
+	}
+	
+	
 }
