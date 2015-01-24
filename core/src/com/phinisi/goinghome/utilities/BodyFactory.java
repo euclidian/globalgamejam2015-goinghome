@@ -31,11 +31,13 @@ public  class BodyFactory {
 //			shape.setAsBox(15, 15);
 			//create a fixture
 			FixtureDef fixturedef = new FixtureDef();
-			fixturedef.shape = shape;	
+			fixturedef.shape = shape;				
 			fixturedef.density = 0.1f;
+			fixturedef.friction = 0.1f;
 			
 			//attach to body
 			body.createFixture(fixturedef);
+			body.setFixedRotation(true);			
 			shape.dispose();
 			
 			return body;			
