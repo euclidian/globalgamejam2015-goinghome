@@ -8,7 +8,11 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+
 public  class BodyFactory {
+	
+	public static float PIXELS_TO_METERS = 100f;
+	
 	public static Body CreateBody(float posX, float posY, float width, float height, BodyType bodyType, World world ){
 		BodyDef bodyDef = new BodyDef();
 		switch (bodyType) {
@@ -17,18 +21,18 @@ public  class BodyFactory {
 
 		case DynamicBody:
 			bodyDef.type = BodyType.DynamicBody;
-			bodyDef.position.set(posX + width/2, posY + height/2);
+			bodyDef.position.set((posX + width/2) / PIXELS_TO_METERS, 
+					(posY + height/2) / PIXELS_TO_METERS);
 			Body body = world.createBody(bodyDef);
 			//create a box shape
 //			CircleShape shape = new CircleShape();
 			PolygonShape shape = new PolygonShape();
-			//shape.setAsBox(width/2, height/2);
-			shape.setAsBox(15, 15);
+			shape.setAsBox((width/2) / PIXELS_TO_METERS, (height/2) / PIXELS_TO_METERS);
+//			shape.setAsBox(15, 15);
 			//create a fixture
 			FixtureDef fixturedef = new FixtureDef();
-			fixturedef.shape = shape;			
-			fixturedef.friction = 0.4f;
-			fixturedef.density = 1f;
+			fixturedef.shape = shape;	
+			fixturedef.density = 0.1f;
 			
 			//attach to body
 			body.createFixture(fixturedef);

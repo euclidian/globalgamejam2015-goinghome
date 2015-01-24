@@ -21,11 +21,15 @@ public class Character extends PhysicsObject{
 	public void jump() {		
 		Gdx.app.log("A", "Jump, body mass: "+ body.getMass());
 //		this.body.applyLinearImpulse(new Vector2(0, 10000), new Vector2(this.charSprite.getX(), this.charSprite.getY()), false);
-//		this.body.applyForceToCenter(new Vector2(0, 500), true);
+		this.body.applyForceToCenter(new Vector2(0, 3), true);
 //		this.body.applyLinearImpulse(new Vector2(0, 100),body.getLocalCenter(),true);
 //		this.body.setLinearVelocity(0, 1000);
-//		float impulse = body.getMass() * 5000000;
+//		float impulse = 1;
 //	    body.applyLinearImpulse( new Vector2(0,impulse), new Vector2(body.getPosition().x, body.getPosition().y),true );		
-		body.setLinearVelocity(0, 100000);
+//		body.setLinearVelocity(0, 100000);
+	}
+
+	public void moveRight() {
+		this.body.applyForceToCenter(new Vector2(3, 0), true);
 	}	
 }

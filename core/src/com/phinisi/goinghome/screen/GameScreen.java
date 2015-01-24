@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.phinisi.goinghome.GoingHome;
 import com.phinisi.goinghome.entities.Character;
+import com.phinisi.goinghome.utilities.BodyFactory;
 import com.phinisi.goinghome.utilities.Constants;
 
 public class GameScreen extends AbstractScreen implements InputProcessor {
@@ -36,13 +37,8 @@ public class GameScreen extends AbstractScreen implements InputProcessor {
 	
 	//character
 	Character gameCharacter;
-	Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+	Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();	
 	
-	public final float PIXELS_TO_METERS = 100f;
-	
-	private static final float WOLRD_TO_BOX = 0.01f;
-	private static final float BOX_TO_WORLD = 100f;
-
 	public GameScreen(GoingHome game) {
 		super(game);
 	}
@@ -61,7 +57,7 @@ public class GameScreen extends AbstractScreen implements InputProcessor {
 		tiledMap = new TmxMapLoader().load("level1.tmx");
 		tiledMapRenderer = new OrthoCachedTiledMapRenderer(tiledMap);
 
-		box2dWorld = new World(new Vector2(0, -98f), false); 
+		box2dWorld = new World(new Vector2(0, -10f), false); 
 		
 		loadObjectLayer();
 		
@@ -80,12 +76,13 @@ public class GameScreen extends AbstractScreen implements InputProcessor {
 			Gdx.app.log("GoingHome", String.format("X: %f,  Y: %f, W: %f, H : %f",r.x, r.y,r.width, r.height));
 			//create ploygon shape body
 			BodyDef platformBodyDef = new BodyDef();
-			platformBodyDef.position.set(new Vector2(r.x + r.width/2,r.y + r.height/2));
+			platformBodyDef.position.set(new Vector2((r.x + r.width/2) / BodyFactory.PIXELS_TO_METERS,
+					(r.y + r.height/2) / BodyFactory.PIXELS_TO_METERS));
 			//create a body from 
 			Body platformBody = box2dWorld.createBody(platformBodyDef);
 			//create a polygon shape
 			PolygonShape platformBox = new PolygonShape();
-			platformBox.setAsBox(r.width/2, r.height/2);
+			platformBox.setAsBox(r.width/2 / BodyFactory.PIXELS_TO_METERS, r.height/2 / BodyFactory.PIXELS_TO_METERS);
 			platformBody.createFixture(platformBox,0);
 			platformBox.dispose();
 		}
@@ -106,21 +103,25 @@ public class GameScreen extends AbstractScreen implements InputProcessor {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		Gdx.gl.glClearColor(0, 0, 0, 1);		
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 				
-		camera.update();
-		gameCharacter.update();
-		box2dWorld.step(Gdx.graphics.getDeltaTime(), 6, 2);
+		box2dWorld.step(1/60f, 6, 2);
+		camera.update();		
+		gameCharacter.update();		
 		
-		myGame.getSpriteBatch().begin();
+		myGame.getSpriteBatch().setProjectionMatrix(camera.combined);
+//		myGame.getSpriteBatch().setTransformMatrix(camera.view);
+		myGame.getSpriteBatch().begin();		
 		gameCharacter.charSprite.draw(myGame.getSpriteBatch());
 		myGame.getSpriteBatch().end();
 		
 		tiledMapRenderer.setView(camera);
-		tiledMapRenderer.render();		
-		debugRenderer.render(box2dWorld, camera.combined);			
+		tiledMapRenderer.render();	
+		
+		Matrix4 debugMatrix = myGame.getSpriteBatch().getProjectionMatrix().cpy().scale(BodyFactory.PIXELS_TO_METERS, 
+				BodyFactory.PIXELS_TO_METERS, 0);
+		debugRenderer.render(box2dWorld, debugMatrix);			
 	}
 
 	@Override
@@ -151,6 +152,8 @@ public class GameScreen extends AbstractScreen implements InputProcessor {
 	public boolean keyDown(int keycode) {
 		if(keycode == Keys.SPACE){
 			gameCharacter.jump();
+		}else if(keycode == Keys.RIGHT){
+			gameCharacter.moveRight();
 		}
 		return false;
 	}
