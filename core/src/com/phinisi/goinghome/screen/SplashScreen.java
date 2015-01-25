@@ -8,7 +8,7 @@ import com.phinisi.goinghome.GoingHome;
 
 public class SplashScreen extends AbstractScreen{
 
-	float maxTime = 2;
+	float maxTime = 3;
 	float currTime = 0;
 	Texture bg;
 	SpriteBatch spriteBatch;
@@ -28,14 +28,15 @@ public class SplashScreen extends AbstractScreen{
 	public void render(float delta) {
 		currTime += delta;
 		if(currTime > maxTime){
-			myGame.setScreen(new GameScreen(myGame));
+			myGame.setScreen(new OpeningScreen(myGame));
 		}
-		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClearColor(0, 0, 0, currTime / maxTime);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();               
         
         spriteBatch.setProjectionMatrix(camera.projection);
         spriteBatch.setTransformMatrix(camera.view);
+        spriteBatch.setColor(1, 1, 1, 1 - currTime/maxTime);
 		spriteBatch.begin();
 		spriteBatch.draw(bg, 0, 0);
 		spriteBatch.end();

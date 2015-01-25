@@ -101,7 +101,7 @@ public class Character extends PhysicsObject{
 			spriteBatch.draw(texture, charSprite.getX(), charSprite.getY(), texture.getWidth(), texture.getHeight(), 0, 0, texture.getWidth(), texture.getHeight(), lastFacing, false);
 		}
 		if(isCarryingEgg){
-			spriteBatch.draw(eggTexture, charSprite.getX() + charSprite.getWidth()/2 - eggTexture.getWidth()/2, charSprite.getY() + charSprite.getHeight());
+			spriteBatch.draw(eggTexture, charSprite.getX() + charSprite.getWidth()/2 - eggTexture.getWidth()/2, charSprite.getY() + charSprite.getHeight() + 10);
 		}
 	}
 

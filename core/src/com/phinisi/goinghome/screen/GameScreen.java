@@ -146,17 +146,17 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		jumpButton = new Texture("ui/jump.png");
 		pickButton = new Texture("ui/egg.png");
 
-		leftButtonPosX = 20;
-		leftButtonPosY = 0;
+		leftButtonPosX = 10;
+		leftButtonPosY = 18;
 
-		rightButtonPosX = 120;
-		rightButtonPosY = 0;
+		rightButtonPosX = 102;
+		rightButtonPosY = 18;
 
-		jumpButtonPosX = Constants.GRAPHIC_WIDTH - 2 * jumpButton.getWidth();
-		jumpButtonPosY = 0;
+		jumpButtonPosX = Constants.GRAPHIC_WIDTH - 18 -  jumpButton.getWidth();
+		jumpButtonPosY = 18;
 
-		pickButtonX = Constants.GRAPHIC_WIDTH - 5 * pickButton.getWidth();
-		pickButtonY = 0;
+		pickButtonX = jumpButtonPosX - 18 * 3 - pickButton.getWidth();
+		pickButtonY = 18;
 
 	}
 
@@ -421,21 +421,21 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		Vector3 pos = camera.unproject(new Vector3(screenX, screenY, 0));
 		Gdx.app.log("GoingHome", String.format("Pos: %f,%f", pos.x, pos.y));
 		Gdx.app.log("GoingHome", String.format("Pos: %d,%d", screenX, screenY));
-		if (isButtonPressed(pos.x, pos.y, leftButtonPosX, leftButtonPosY,
-				leftButton.getWidth(), leftButton.getHeight())) {
+		if (isButtonPressed(pos.x, pos.y, leftButtonPosX, leftButtonPosY - 18,
+				100, 100)) {
 			isLeftTouched = true;
 			isLeftUp = false;
 		} else if (isButtonPressed(pos.x, pos.y, rightButtonPosX,
-				rightButtonPosY, rightButton.getWidth(),
-				rightButton.getHeight())) {
+				rightButtonPosY - 18, 100 ,
+				100)) {
 			isRightTouched = true;
 			isRightUp = false;
-		} else if (isButtonPressed(pos.x, pos.y, jumpButtonPosX,
-				jumpButtonPosY, jumpButton.getWidth(), jumpButton.getHeight())
+		} else if (isButtonPressed(pos.x, pos.y, jumpButtonPosX - 18,
+				jumpButtonPosY - 18, 100, 100)
 				&& gameCharacter.body.getLinearVelocity().y == 0) {
 			gameCharacter.jump();
-		} else if (isButtonPressed(pos.x, pos.y, pickButtonX, pickButtonY,
-				pickButton.getWidth(), pickButton.getHeight())) {
+		} else if (isButtonPressed(pos.x, pos.y, pickButtonX - 18, pickButtonY - 18,
+				100, 100)) {
 			boolean test = true;
 			if (fortress != null && fortress.isCarryingEgg())
 				test = false;

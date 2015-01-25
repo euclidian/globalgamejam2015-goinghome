@@ -3,6 +3,7 @@ package com.phinisi.goinghome;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.phinisi.goinghome.screen.CreditScreen;
 import com.phinisi.goinghome.screen.GameScreen;
 import com.phinisi.goinghome.screen.SplashScreen;
 
@@ -16,6 +17,8 @@ public class GoingHome extends Game {
 		setScreen(gameScreen);
 //		SplashScreen splashScreen = new SplashScreen(this);
 //		setScreen(splashScreen);
+//		CreditScreen creditScreen = new CreditScreen(this);
+//		setScreen(creditScreen);
 		Gdx.app.setLogLevel(Gdx.app.LOG_NONE);
 	}
 	
