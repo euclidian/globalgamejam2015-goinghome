@@ -22,6 +22,7 @@ public class Character extends PhysicsObject{
 	TextureAnimation animation;
 	
 	private boolean isCarryingEgg = false;
+	boolean lastFacing = false; //kanan
 	
 	public Character(World world){		
 		texture = new Texture("karakter/kar-1.png");
@@ -40,7 +41,7 @@ public class Character extends PhysicsObject{
 	public void jump() {		
 		Gdx.app.log("A", "Jump, body mass: "+ body.getMass());
 //		this.body.applyLinearImpulse(new Vector2(0, 10000), new Vector2(this.charSprite.getX(), this.charSprite.getY()), false);
-		this.body.applyForceToCenter(new Vector2(0, 15), true);
+		this.body.applyForceToCenter(new Vector2(0, 4), true);
 //		this.body.applyLinearImpulse(new Vector2(0, 100),body.getLocalCenter(),true);
 //		this.body.setLinearVelocity(0, 1000);
 //		float impulse = 1;
@@ -51,18 +52,23 @@ public class Character extends PhysicsObject{
 	public void moveRight() {		
 //		this.body.setLinearVelocity(5, body.getLinearVelocity().y);
 		if(this.body.getLinearVelocity().x < 3){
-			this.body.applyForceToCenter(new Vector2(3, 0), true);
+			this.body.applyForceToCenter(new Vector2(1, 0), true);
 		}
 	}
 
 	public void moveLeft() {
 		if(this.body.getLinearVelocity().x > -3 ){
-			this.body.applyForceToCenter(new Vector2(-3, 0), true);
+			this.body.applyForceToCenter(new Vector2(-1, 0), true);
 		}		
 //		this.body.setLinearVelocity(-5, body.getLinearVelocity().y);
 	}
 
 	public void stopMoving() {
+		if(this.body.getLinearVelocity().x < 0){
+			lastFacing = true;
+		}else{
+			lastFacing = false;
+		}
 		this.body.setLinearVelocity(0, body.getLinearVelocity().y);		
 	}	
 	
@@ -91,10 +97,11 @@ public class Character extends PhysicsObject{
 			animation.draw(spriteBatch);
 		}else{
 			this.charSprite.setTexture(texture);
-			super.draw(spriteBatch);
+//			super.draw(spriteBatch);
+			spriteBatch.draw(texture, charSprite.getX(), charSprite.getY(), texture.getWidth(), texture.getHeight(), 0, 0, texture.getWidth(), texture.getHeight(), lastFacing, false);
 		}
 		if(isCarryingEgg){
-			spriteBatch.draw(eggTexture, charSprite.getX(), charSprite.getY() + charSprite.getHeight());
+			spriteBatch.draw(eggTexture, charSprite.getX() + charSprite.getWidth()/2 - eggTexture.getWidth()/2, charSprite.getY() + charSprite.getHeight());
 		}
 	}
 

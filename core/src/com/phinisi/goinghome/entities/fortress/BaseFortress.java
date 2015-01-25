@@ -88,7 +88,7 @@ public abstract class BaseFortress extends PhysicsObject{
 	public void draw(SpriteBatch spriteBatch) {		
 		super.draw(spriteBatch);
 		if(isCarryingEgg){
-			spriteBatch.draw(t, charSprite.getX() + charSprite.getWidth()/2, charSprite.getY() + charSprite.getHeight());
+			spriteBatch.draw(t, charSprite.getX() + charSprite.getWidth()/2 - t.getWidth()/2, charSprite.getY() + charSprite.getHeight());
 		}
 	}
 

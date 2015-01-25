@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -109,7 +110,7 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 				Constants.GRAPHIC_HEIGHT);
 
 		tiledMap = new TmxMapLoader().load("level1.tmx");
-		tiledMapRenderer = new OrthoCachedTiledMapRenderer(tiledMap);
+		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
 		box2dWorld = new World(new Vector2(0, -10f), false);
 		box2dWorld.setContactListener(this);
@@ -213,9 +214,11 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 	private void loadObjectLayer() {
 		// load layer with name = bounds
 		MapLayer boundingLayer = tiledMap.getLayers().get("bounds");
+		boundingLayer.setVisible(false);
 		MapObjects objects = boundingLayer.getObjects();
 		// iterate each object
 		for (int i = 0; i < objects.getCount(); i++) {
+			objects.get(i).setVisible(false);
 			RectangleMapObject polyObject = (RectangleMapObject) objects.get(i);
 			String wallType = (String) objects.get(i).getProperties()
 					.get("type");
@@ -275,12 +278,12 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0.25f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
 
 		update(delta);
 
 		myGame.getSpriteBatch().setProjectionMatrix(camera.combined);
 		// myGame.getSpriteBatch().setTransformMatrix(camera.view);
-
 		
 
 		myGame.getSpriteBatch().begin();
@@ -288,7 +291,7 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		myGame.getSpriteBatch().end();
 		
 		tiledMapRenderer.setView(camera);		
-		tiledMapRenderer.render();
+		tiledMapRenderer.render();		
 		
 		myGame.getSpriteBatch().begin();
 		gameCharacter.draw(myGame.getSpriteBatch());
@@ -308,7 +311,7 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 				.cpy()
 				.scale(Constants.PIXELS_TO_METERS, Constants.PIXELS_TO_METERS,
 						0);
-		debugRenderer.render(box2dWorld, debugMatrix);
+//		debugRenderer.render(box2dWorld, debugMatrix);
 		box2dWorld.step(1 / 45f, 6, 2);
 	}
 

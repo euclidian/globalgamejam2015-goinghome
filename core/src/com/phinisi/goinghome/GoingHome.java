@@ -12,10 +12,10 @@ public class GoingHome extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-//		GameScreen gameScreen = new GameScreen(this);
-//		setScreen(gameScreen);
-		SplashScreen splashScreen = new SplashScreen(this);
-		setScreen(splashScreen);
+		GameScreen gameScreen = new GameScreen(this);
+		setScreen(gameScreen);
+//		SplashScreen splashScreen = new SplashScreen(this);
+//		setScreen(splashScreen);
 		Gdx.app.setLogLevel(Gdx.app.LOG_NONE);
 	}
 	

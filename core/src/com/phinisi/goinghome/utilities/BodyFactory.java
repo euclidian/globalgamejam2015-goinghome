@@ -24,7 +24,7 @@ public  class BodyFactory {
 			//create a box shape
 //			CircleShape shape = new CircleShape();
 			PolygonShape shape = new PolygonShape();
-			shape.setAsBox((width/2) / Constants.PIXELS_TO_METERS, (height/2) / Constants.PIXELS_TO_METERS);
+			shape.setAsBox((width/2) / Constants.PIXELS_TO_METERS, (40 *height/100) / Constants.PIXELS_TO_METERS);
 //			shape.setAsBox(15, 15);
 			//create a fixture
 			FixtureDef fixturedef = new FixtureDef();

@@ -58,7 +58,7 @@ public abstract class BaseMonster extends PhysicsObject{
 		
 		
 		fire1 = new Texture("monster/Api-1.png");
-		fire2 = new Texture("monster/Api-1.png");
+		fire2 = new Texture("monster/Api-2.png");
 		
 		fireAnimation = new TextureAnimation(0.5f, true, fire1,fire2);		
 		
@@ -93,7 +93,7 @@ public abstract class BaseMonster extends PhysicsObject{
 		super.update(deltaTime);
 				
 		animation.setPosition(charSprite.getX(), charSprite.getY());
-		fireAnimation.setPosition(charSprite.getX(), charSprite.getY());
+		fireAnimation.setPosition(charSprite.getX() - charSprite.getWidth()/2, charSprite.getY());
 		
 		if(body.getLinearVelocity().x > 0){
 			fireAnimation.setFlip(true);
