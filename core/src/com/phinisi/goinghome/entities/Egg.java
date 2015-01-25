@@ -27,7 +27,7 @@ public class Egg extends PhysicsObject {
 				BodyType.DynamicBody, 
 				world, 
 				Constants.EggCategory, 
-				(short)~(Constants.CharCategory | Constants.MonsterCategory));
+				(short)~(Constants.CharCategory ));
 		createSensor(world);
 		this.body.setUserData(this);
 		this.world = world;

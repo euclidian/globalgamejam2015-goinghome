@@ -7,9 +7,11 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
@@ -50,9 +52,14 @@ import com.phinisi.goinghome.utilities.Point;
 public class GameScreen extends AbstractScreen implements InputProcessor,
 		ContactListener {
 
-	
+	enum GameState {
+		START, END
+	}
+
+	GameState state = GameState.START;
+
 	Texture bg;
-	
+
 	public String tmxFilename;
 	TiledMap tiledMap;
 	TiledMapRenderer tiledMapRenderer;
@@ -60,6 +67,9 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 	// create box2d world
 	World box2dWorld;
 	// create box2d debugrenderer
+
+	float totalTime = 100;
+	float stateTime = 0, maxTime = 3;
 
 	// character
 	Character gameCharacter;
@@ -94,6 +104,10 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 
 	Random r = new Random(System.currentTimeMillis());
 
+	BitmapFont font = new BitmapFont();
+
+	Music bgm;
+
 	public GameScreen(GoingHome game) {
 		super(game);
 	}
@@ -101,6 +115,8 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 	@Override
 	public void create() {
 		Gdx.input.setInputProcessor(this);
+		bgm = Gdx.audio.newMusic(Gdx.files.internal("8bit.mp3"));
+		bgm.play();
 		camera = new OrthographicCamera(Constants.GRAPHIC_WIDTH,
 				Constants.GRAPHIC_HEIGHT);
 		camera.update();
@@ -116,7 +132,7 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		box2dWorld.setContactListener(this);
 
 		generator = new FortressGenerator(box2dWorld);
-		
+
 		bg = new Texture("BG-awan.png");
 
 		loadObjectLayer();
@@ -152,7 +168,7 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		rightButtonPosX = 102;
 		rightButtonPosY = 18;
 
-		jumpButtonPosX = Constants.GRAPHIC_WIDTH - 18 -  jumpButton.getWidth();
+		jumpButtonPosX = Constants.GRAPHIC_WIDTH - 18 - jumpButton.getWidth();
 		jumpButtonPosY = 18;
 
 		pickButtonX = jumpButtonPosX - 18 * 3 - pickButton.getWidth();
@@ -278,21 +294,25 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0.25f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
 
 		update(delta);
 
 		myGame.getSpriteBatch().setProjectionMatrix(camera.combined);
 		// myGame.getSpriteBatch().setTransformMatrix(camera.view);
-		
+
+		if (state == GameState.END) {
+			myGame.getSpriteBatch().setColor(1, 1, 1, 1 - stateTime / maxTime);
+		} else {
+			myGame.getSpriteBatch().setColor(1, 1, 1, 1);
+		}
 
 		myGame.getSpriteBatch().begin();
-		myGame.getSpriteBatch().draw(bg, 0, 0);		
+		myGame.getSpriteBatch().draw(bg, 0, 0);
 		myGame.getSpriteBatch().end();
-		
-		tiledMapRenderer.setView(camera);		
-		tiledMapRenderer.render();		
-		
+
+		tiledMapRenderer.setView(camera);
+		tiledMapRenderer.render();
+
 		myGame.getSpriteBatch().begin();
 		gameCharacter.draw(myGame.getSpriteBatch());
 		egg.draw(myGame.getSpriteBatch());
@@ -302,8 +322,12 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		for (BaseMonster m : monsters) {
 			m.draw(myGame.getSpriteBatch());
 		}
+		// draw font
+		String s = "Sisa Waktu: " + (int) totalTime + " detik";
+		font.draw(myGame.getSpriteBatch(), s, Constants.GRAPHIC_WIDTH - 150,
+				Constants.GRAPHIC_HEIGHT - 20);
 		drawControlUI();
-		myGame.getSpriteBatch().end();			
+		myGame.getSpriteBatch().end();
 
 		Matrix4 debugMatrix = myGame
 				.getSpriteBatch()
@@ -311,75 +335,98 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 				.cpy()
 				.scale(Constants.PIXELS_TO_METERS, Constants.PIXELS_TO_METERS,
 						0);
-//		debugRenderer.render(box2dWorld, debugMatrix);
+		// debugRenderer.render(box2dWorld, debugMatrix);
 		box2dWorld.step(1 / 45f, 6, 2);
 	}
 
 	private void update(float deltaTime) {
-		if (isLeftTouched)
-			gameCharacter.moveLeft();
-		if (isRightTouched)
-			gameCharacter.moveRight();
-		
-		camera.update();
-		gameCharacter.update(deltaTime);
-		egg.update(deltaTime);
+		if (state != GameState.END) {
+			totalTime -= deltaTime;
+			if (totalTime < 0) {
+				this.state = GameState.END;
+				bgm.stop();
+				bgm.dispose();
+				return;
+			}
+			if (isLeftTouched)
+				gameCharacter.moveLeft();
+			if (isRightTouched)
+				gameCharacter.moveRight();
 
-		// update fortress
-		generator.update(deltaTime);
-		if (fortress != null) {
-			fortress.update(deltaTime);
-			if(fortress.getHp() <=0){
-				fortress.releaseEgg();
-				egg.put(fortress.charSprite.getX(),
-						fortress.charSprite.getY());
-				Rectangle r = new Rectangle(fortress.charSprite.getX() - fortress.charSprite.getWidth(),
-						fortress.charSprite.getY(), 
-						fortress.charSprite.getWidth() * 2,
-						fortress.charSprite.getHeight());
-				Rectangle r2 = new Rectangle(gameCharacter.charSprite.getX() - gameCharacter.charSprite.getWidth(),
-						gameCharacter.charSprite.getY(), 
-						gameCharacter.charSprite.getWidth() * 2,
-						gameCharacter.charSprite.getHeight());
-				if(r.contains(r2)){
-					isEggInRadar = true;
+			camera.update();
+			gameCharacter.update(deltaTime);
+			egg.update(deltaTime);
+
+			// update fortress
+			generator.update(deltaTime);
+			if (fortress != null) {
+				fortress.update(deltaTime);
+				if (fortress.getHp() <= 0) {
+					fortress.releaseEgg();
+					egg.put(fortress.charSprite.getX(),
+							fortress.charSprite.getY());
+					Rectangle r = new Rectangle(fortress.charSprite.getX()
+							- fortress.charSprite.getWidth(),
+							fortress.charSprite.getY(),
+							fortress.charSprite.getWidth() * 2,
+							fortress.charSprite.getHeight());
+					Rectangle r2 = new Rectangle(
+							gameCharacter.charSprite.getX()
+									- gameCharacter.charSprite.getWidth(),
+							gameCharacter.charSprite.getY(),
+							gameCharacter.charSprite.getWidth() * 2,
+							gameCharacter.charSprite.getHeight());
+					if (r.contains(r2)) {
+						isEggInRadar = true;
+					}
+					box2dWorld.destroyBody(fortress.body);
+					fortress = null;
 				}
-				box2dWorld.destroyBody(fortress.body);
-				fortress = null;
 			}
-		}
-		if (fortress == null) {
-			if (egg.charSprite.getX() > Constants.GRAPHIC_WIDTH / 2) {
-				int index = Math.abs(r.nextInt()) % leftPoints.size();
-				fortress = generator.tryGetFortress(leftPoints.get(index)
-						.getX(), leftPoints.get(index).getY());
+			if (fortress == null) {
+				if (egg.charSprite.getX() > Constants.GRAPHIC_WIDTH / 2) {
+					int index = Math.abs(r.nextInt()) % leftPoints.size();
+					fortress = generator.tryGetFortress(leftPoints.get(index)
+							.getX(), leftPoints.get(index).getY());
+				} else {
+					int index = Math.abs(r.nextInt()) % rightPoints.size();
+					fortress = generator.tryGetFortress(rightPoints.get(index)
+							.getX(), rightPoints.get(index).getY());
+				}
+			}
+
+			// update monsters
+			List<BaseMonster> deletedMonsters = new ArrayList<BaseMonster>();
+			for (BaseMonster m : monsters) {
+				m.update(deltaTime);
+				if (m.isDie()) {
+					deletedMonsters.add(m);
+				}
+			}
+			for (BaseMonster del : deletedMonsters) {
+				box2dWorld.destroyBody(del.body);
+				monsters.remove(del);
+			}
+
+			if (monsters.size() < 5) {
+				for (int i = 0; i < 5; i++) {
+					BaseMonster m = MonsterGenerator.getMonster(box2dWorld);
+					m.setWakeTime(i + 1);
+					monsters.add(m);
+				}
+			}
+		} else {
+			stateTime += deltaTime;
+			if (stateTime > maxTime) {
+				myGame.setScreen(new GameScreen(myGame));
 			} else {
-				int index = Math.abs(r.nextInt()) % rightPoints.size();
-				fortress = generator.tryGetFortress(rightPoints.get(index)
-						.getX(), rightPoints.get(index).getY());
+				// this.gameCharacter.charSprite.setPosition(gameCharacter.charSprite.getX(),
+				// gameCharacter.charSprite.getY())
 			}
+			// box2dWorld.dispose();
+			// myGame.setScreen(new GameScreen(myGame));
 		}
 
-		// update monsters
-		List<BaseMonster> deletedMonsters = new ArrayList<BaseMonster>();
-		for (BaseMonster m : monsters) {
-			m.update(deltaTime);
-			if (m.isDie()) {
-				deletedMonsters.add(m);
-			}
-		}
-		for (BaseMonster del : deletedMonsters) {
-			box2dWorld.destroyBody(del.body);
-			monsters.remove(del);
-		}
-		
-		if(monsters.size() < 5){
-			for(int i=0;i<5;i++){
-				BaseMonster m = MonsterGenerator.getMonster(box2dWorld);
-				m.setWakeTime(i + 1);
-				monsters.add(m);
-			}
-		}
 	}
 
 	private void drawControlUI() {
@@ -426,16 +473,15 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 			isLeftTouched = true;
 			isLeftUp = false;
 		} else if (isButtonPressed(pos.x, pos.y, rightButtonPosX,
-				rightButtonPosY - 18, 100 ,
-				100)) {
+				rightButtonPosY - 18, 100, 100)) {
 			isRightTouched = true;
 			isRightUp = false;
 		} else if (isButtonPressed(pos.x, pos.y, jumpButtonPosX - 18,
 				jumpButtonPosY - 18, 100, 100)
 				&& gameCharacter.body.getLinearVelocity().y == 0) {
 			gameCharacter.jump();
-		} else if (isButtonPressed(pos.x, pos.y, pickButtonX - 18, pickButtonY - 18,
-				100, 100)) {
+		} else if (isButtonPressed(pos.x, pos.y, pickButtonX - 18,
+				pickButtonY - 18, 100, 100)) {
 			boolean test = true;
 			if (fortress != null && fortress.isCarryingEgg())
 				test = false;
@@ -498,12 +544,14 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		checkMonsterCharacterCollision(fixtureA, fixtureB);
 		checkCharWallCollision(contact, fixtureA, fixtureB);
 		checkCharEggCollision(fixtureA, fixtureB);
+		checkMonsterEggCollision(fixtureA, fixtureB);
 		checkCharFortressCollision(fixtureA, fixtureB);
 		checkMonsterFortressCollision(contact, fixtureA, fixtureB);
 
 	}
 
-	private void checkMonsterFortressCollision(Contact contact, Object fixtureA, Object fixtureB) {
+	private void checkMonsterFortressCollision(Contact contact,
+			Object fixtureA, Object fixtureB) {
 		if ((fixtureA instanceof BaseMonster || fixtureB instanceof BaseMonster)
 				&& (fixtureA instanceof BaseFortress || fixtureB instanceof BaseFortress)) {
 
@@ -516,7 +564,8 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 				c = (BaseFortress) fixtureB;
 				g = (BaseMonster) fixtureA;
 			}
-			if(c.damaged()) g.die();
+			if (c.damaged())
+				g.die();
 		}
 	}
 
@@ -542,6 +591,27 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 		if ((fixtureA instanceof Character || fixtureB instanceof Character)
 				&& (fixtureA instanceof Egg || fixtureB instanceof Egg)) {
 			isEggInRadar = true;
+			// Character c;
+			// Egg g;
+			// if(fixtureA instanceof Character){
+			// c = (Character)fixtureA;
+			// g = (Egg) fixtureB;
+			// }else{
+			// c = (Character)fixtureB;
+			// g = (Egg) fixtureA;
+			// }
+			//
+			//
+
+		}
+	}
+
+	private void checkMonsterEggCollision(Object fixtureA, Object fixtureB) {
+		if ((fixtureA instanceof BaseMonster || fixtureB instanceof BaseMonster)
+				&& (fixtureA instanceof Egg || fixtureB instanceof Egg)) {
+			this.state = GameState.END;
+			bgm.stop();
+			bgm.dispose();
 			// Character c;
 			// Egg g;
 			// if(fixtureA instanceof Character){
@@ -583,6 +653,10 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 					isLeftTouched = true;
 				if (!isRightUp)
 					isRightTouched = true;
+			} else if (wallType.equalsIgnoreCase("1")) {
+				// gameCharacter.stopMoving();
+				// isLeftTouched = false;
+				// isRightTouched = false;
 			}
 
 			Gdx.app.log(
@@ -607,6 +681,10 @@ public class GameScreen extends AbstractScreen implements InputProcessor,
 			if (c.body.getPosition().y > m.body.getPosition().y
 					&& c.body.getLinearVelocity().y < 0) {
 				m.die();
+			} else {
+				this.state = GameState.END;
+				bgm.stop();
+				bgm.dispose();
 			}
 		}
 

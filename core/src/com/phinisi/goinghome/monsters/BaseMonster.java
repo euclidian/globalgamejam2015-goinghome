@@ -50,7 +50,7 @@ public abstract class BaseMonster extends PhysicsObject{
 				BodyType.DynamicBody, 
 				world,
 				Constants.MonsterCategory,
-				(short)(~Constants.MonsterCategory & ~Constants.CharCategory));
+				(short)(~Constants.MonsterCategory ));
 		this.body.setActive(false);
 		this.body.setUserData(this);	
 		this.speed = 2;
