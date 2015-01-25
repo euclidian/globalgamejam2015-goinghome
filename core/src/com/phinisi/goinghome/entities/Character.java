@@ -32,7 +32,7 @@ public class Character extends PhysicsObject{
 		animation = new TextureAnimation(0.5f, true, texture1,texture2);
 		this.charSprite = new Sprite(texture);
 		this.charSprite.setPosition(100, 250);
-		this.body = BodyFactory.CreateBody(100, 250, charSprite.getWidth(), charSprite.getHeight(), BodyType.DynamicBody, world, Constants.CharCategory,(short)0xffff);
+		this.body = BodyFactory.CreateBodyTigaPerempat(100, 250, charSprite.getWidth(), charSprite.getHeight(), BodyType.DynamicBody, world, Constants.CharCategory,(short)0xffff);
 		this.body.setUserData(this);
 		
 	}

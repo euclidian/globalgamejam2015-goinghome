@@ -16,9 +16,10 @@ public class Egg extends PhysicsObject {
 	
 	World world;
 	boolean isCarried;
+	Texture texture;
 	
 	public Egg(World world){
-		Texture texture = new Texture("marker.png");
+		texture = new Texture("Egg.png");
 		this.charSprite = new Sprite(texture);
 		this.body = BodyFactory.CreateBody(0, 0, 
 				charSprite.getWidth(), 
@@ -54,6 +55,8 @@ public class Egg extends PhysicsObject {
 	public void put(float posX, float posY){
 		if(isCarried){
 			isCarried = false;
+			texture = new Texture("Egg.png");
+			this.charSprite = new Sprite(texture);
 			this.body = BodyFactory.CreateBody(posX, posY, 
 					charSprite.getWidth(), 
 					charSprite.getHeight(), 
@@ -61,6 +64,7 @@ public class Egg extends PhysicsObject {
 					world, 
 					Constants.EggCategory, 
 					(short)~(Constants.CharCategory | Constants.MonsterCategory));
+			update(0);
 			createSensor(world);
 			this.body.setUserData(this);
 		}

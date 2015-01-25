@@ -46,6 +46,11 @@ public abstract class BaseAnimation {
         this.posY = posY;
     }
     
+    public void setPosition(float posX, float posY){
+    	this.posX = posX;
+    	this.posY = posY;
+    }
+    
     public void reset(){
     	stateTime = 0;
     }

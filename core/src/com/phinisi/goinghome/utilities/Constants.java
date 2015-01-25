@@ -1,7 +1,7 @@
 package com.phinisi.goinghome.utilities;
 
 public class Constants {
-
+	
 	public static int GRAPHIC_WIDTH = 960;
     public static int GRAPHIC_HEIGHT = 540;
     
@@ -12,6 +12,11 @@ public class Constants {
     public static short FireCategory = 0x0010;
     public static short EggCategory = 0x0011;
     public static short EggSensorCategory = 0x0012;
+    public static final short FortressCategory = 0x0014;
+	public static final short FortressSensorCategory = 0x0018;
+	public static final short FortressMonsterSensorCategory = 0x0020;
+    
 	public static float PIXELS_TO_METERS = 100f;
+	
 }
 
